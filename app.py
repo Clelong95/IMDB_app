@@ -20,6 +20,8 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+server = app.server
+
 #---------------- Simple plots (no callbacks) ------------------------------------
 year_hist = px.histogram(df,x="Year",nbins=100, title="Years histogram")
 note_pie = px.pie(df, names='User_note',title='Note repartition')
@@ -105,4 +107,4 @@ def update_actor(input_value):
 
 
 if __name__ == '__main__':
-    app.run_server(port=8080)
+    app.run_server(debug=True)
