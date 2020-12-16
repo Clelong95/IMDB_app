@@ -16,6 +16,10 @@ def build_df(user_id):
     
     while url != 0 :
         page = requests.get(url)
+
+        if not page.ok :
+            return(pd.DataFrame([]))
+            
         soup = BeautifulSoup(page.content,'html.parser')
         
         item_list = soup.find(id="ratings-container").findAll("div",{"class":"lister-item mode-detail"})
