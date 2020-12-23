@@ -31,6 +31,7 @@ def build_df(user_id):
             cast = item.findAll("p",{"class":"text-muted text-small"})[1]
             user_note = item.findAll("span",{"class":"ipl-rating-star__rating"})[1].contents[0]
             imdb_note = item.findAll("span",{"class":"ipl-rating-star__rating"})[0].contents[0]
+            poster_url = item.find("img")["loadlate"]
             
             dict_ = {"Id":id_,
                     "Name":name,
@@ -38,7 +39,8 @@ def build_df(user_id):
                     "Year":year,
                     "Cast":cast,
                     "IMDB_note":imdb_note,
-                    "User_note":user_note}
+                    "User_note":user_note,
+                    "Poster_url":poster_url}
             
             raw_data.append(dict_)
         
@@ -75,6 +77,7 @@ def build_df(user_id):
                "Actor_3" :"string",
                "Actor_4" :"string",
                "Director":"string",
-               "Type":"string"})
+               "Type":"string",
+               "Poster_url":"string"})
     
     return(df)

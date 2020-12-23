@@ -15,7 +15,7 @@ imdb_id = "ur67399547"
 empty_template = {"layout": {"xaxis": {"visible": False},
     						 "yaxis": {"visible": False},
                              "annotations": [
-                {"text": "No matching data found",
+                {"text": "No valid user id",
                 "xref": "paper",
                 "yref": "paper",
                 "showarrow": False,
@@ -24,6 +24,7 @@ empty_template = {"layout": {"xaxis": {"visible": False},
     }
 }
 
+img_style = {"width":"8%","margin":"1%"}
 
 #-------------------Loading css and Lauching app -------------------------------------
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP]
@@ -39,7 +40,7 @@ app.layout = html.Div(children=
 		# Hidden div inside the app that stores the intermediate value
 		dbc.Row(dbc.Col(html.Div(id='intermediate-value', style={'display': 'none'}))),
 		dbc.Row(dbc.Col(html.H1("IMDd Dashboard", style={"textAlign":"center"}))),
-		dbc.Row(dbc.Col(dcc.Input(id = 'imdb_id', value='Enter your IMDB id (example : ur67399547 ) ' , type='text', style={"width":"20%"}))),
+		dbc.Row(dbc.Col(dcc.Input(id = 'imdb_id', value='ur67399547' , type='text', style={"width":"20%"}))),
 		dbc.Row(
 			[
 				dbc.Col(dcc.Graph(id='director_1')),
@@ -61,8 +62,27 @@ app.layout = html.Div(children=
 				dbc.Col(dcc.Graph(id='type_pie')),
 				dbc.Col(dcc.Graph(id='genre_pie')),
 			]
-		)
+		),
+		dbc.Row(
+			[ 
+				dbc.Col(html.H2("Top rated")),
+			]
+		),
 
+		dbc.Row(
+			[
+				html.Img(id="img_1", style = img_style),
+				html.Img(id="img_2", style = img_style),
+				html.Img(id="img_3", style = img_style),
+				html.Img(id="img_4", style = img_style),
+				html.Img(id="img_5", style = img_style),
+				html.Img(id="img_6", style = img_style),
+				html.Img(id="img_7", style = img_style),
+				html.Img(id="img_8", style = img_style),
+				html.Img(id="img_9", style = img_style),
+				html.Img(id="img_10", style = img_style)
+			]
+		),
 	]
 )
 
@@ -100,6 +120,7 @@ def create_df(input_value):
 		df_genre = pd.DataFrame(L_genre).rename({0:'Genre'},axis=1)
 		genre_pie = px.pie(df_genre, names = "Genre", title="Genre repartition")
 		genre_pie.update_traces(textposition='inside', textinfo='percent+label', showlegend= False)
+
 
 	return df.to_json(), year_hist, note_pie, type_pie, genre_pie
 
@@ -173,5 +194,24 @@ def update_actor(df_json,input_value):
 
 	return fig_1,fig_2
 
+@app.callback(
+	Output('img_1', 'src'),
+	Output('img_2', 'src'),
+	Output('img_3', 'src'),
+	Output('img_4', 'src'),
+	Output('img_5', 'src'),
+	Output('img_6', 'src'),
+	Output('img_7', 'src'),
+	Output('img_8', 'src'),
+	Output('img_9', 'src'),
+	Output('img_10', 'src'),
+	Input('intermediate-value','children'))
+def update_images(df_json):
+	df = pd.read_json(df_json)
+	urls = df.sort_values(['User_note','IMDB_note'],ascending=False)["Poster_url"].values[:10]
+	return tuple(urls)
+
+
+	
 if __name__ == '__main__':
 	app.run_server(debug=True)
