@@ -65,24 +65,19 @@ app.layout = html.Div(children=
 		),
 		dbc.Row(
 			[ 
-				dbc.Col(html.H2("Top rated")),
+				dbc.Col(html.H2("Movies explorer")),
 			]
 		),
-
 		dbc.Row(
 			[
-				html.Img(id="img_1", style = img_style),
-				html.Img(id="img_2", style = img_style),
-				html.Img(id="img_3", style = img_style),
-				html.Img(id="img_4", style = img_style),
-				html.Img(id="img_5", style = img_style),
-				html.Img(id="img_6", style = img_style),
-				html.Img(id="img_7", style = img_style),
-				html.Img(id="img_8", style = img_style),
-				html.Img(id="img_9", style = img_style),
-				html.Img(id="img_10", style = img_style)
+				dbc.Col(dcc.Checklist(id="type_checklist",
+									  options=[{'label': 'Movie', 'value': 'Movie'},
+            									{'label': 'Serie', 'value': 'Serie'}],
+            						  value=['Movie','Serie'])),
+				dbc.Col(dcc.Dropdown(id="director_dropdown",value=[],multi=True))
 			]
 		),
+		dbc.Row(id="poster_row"),
 	]
 )
 
@@ -92,7 +87,8 @@ app.layout = html.Div(children=
 	Output('year_hist','figure'),
 	Output('note_pie','figure'),
 	Output('type_pie','figure'),
-	Output('genre_pie','figure'), 
+	Output('genre_pie','figure'),
+	Output('director_dropdown','options'),
 	Input('imdb_id','value')
 	)
 def create_df(input_value):
@@ -121,8 +117,10 @@ def create_df(input_value):
 		genre_pie = px.pie(df_genre, names = "Genre", title="Genre repartition")
 		genre_pie.update_traces(textposition='inside', textinfo='percent+label', showlegend= False)
 
+		director_options =  [{"label":i,"value":i} for i in df.Director.unique()]
 
-	return df.to_json(), year_hist, note_pie, type_pie, genre_pie
+
+	return df.to_json(), year_hist, note_pie, type_pie, genre_pie, director_options
 
 @app.callback(
 	Output('director_1', 'figure'),
@@ -195,23 +193,19 @@ def update_actor(df_json,input_value):
 	return fig_1,fig_2
 
 @app.callback(
-	Output('img_1', 'src'),
-	Output('img_2', 'src'),
-	Output('img_3', 'src'),
-	Output('img_4', 'src'),
-	Output('img_5', 'src'),
-	Output('img_6', 'src'),
-	Output('img_7', 'src'),
-	Output('img_8', 'src'),
-	Output('img_9', 'src'),
-	Output('img_10', 'src'),
-	Input('intermediate-value','children'))
-def update_images(df_json):
+	Output('poster_row','children'),
+	Input('intermediate-value','children'),
+	Input('type_checklist','value'),
+	Input('director_dropdown','value'))
+def update_images(df_json,type_list,director_list):
 	df = pd.read_json(df_json)
-	urls = df.sort_values(['User_note','IMDB_note'],ascending=False)["Poster_url"].values[:10]
-	return tuple(urls)
+	df = df[df['Type'].isin(type_list)]
+	if len(director_list) != 0 :
+		df = df[df['Director'].isin(director_list)]
 
+	urls = df.sort_values(['User_note','IMDB_note'],ascending=False)["Poster_url"].values
+	to_return = [html.Img(id="img_".format(i),src=urls[i],style=img_style) for i in range(len(urls))]
+	return to_return
 
-	
 if __name__ == '__main__':
 	app.run_server(debug=True)
