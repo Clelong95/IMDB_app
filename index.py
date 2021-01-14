@@ -12,16 +12,26 @@ from app import server
 # Connect to the app pages
 from apps import statistics, explorer
 
+link_style = {'font-size':'24px','font-color':'yellow','margin':'5px','border':'2px solid black'}
+top_style = {'background':'black', 'width':'100%','height':'10%'}
+
 app.layout = html.Div([
 	# Hidden div inside the app that stores the intermediate value
-	html.Div(id='intermediate-value', style={'display': 'none'}),
+	dbc.Row(dbc.Col(html.Div(id='intermediate-value', style={'display': 'none'}))),
+	
 	# Input for user id
-	dcc.Input(id = 'imdb_id', value="ur67399547" , type='text', style={"width":"20%"}),
-	html.Div([
-			dcc.Link('Statistics',href='/apps/statistics'),
-			dcc.Link('Movies explorer', href='/apps/explorer'),
-		], className="row"),
-	dcc.Location(id='url', refresh = False, pathname=''),
+	dbc.Row([
+		dbc.Col(dcc.Input(id = 'imdb_id', value="ur67399547" , type='text', style={"width":"100%"})),
+		
+		dbc.Col(html.Div([
+							dcc.Link('Statistics',href='/apps/statistics',style=link_style),
+							dcc.Link('Movies explorer', href='/apps/explorer',style=link_style),
+						]),
+				style={'display': 'flex','justify-content': 'center'}),
+
+		dbc.Col(dcc.Location(id='url', refresh = False, pathname='')),
+		], id="top", style=top_style),
+	
 	html.Div(id='page_content', children=[])
 ])
 
@@ -43,7 +53,7 @@ def display_page(pathname):
 	if pathname == '/apps/explorer':
 		return explorer.layout
 	else :
-		return "Please choose a Link"		
+		return statistics.layout
 
 if __name__ == '__main__':
     app.run_server(debug=False)

@@ -15,7 +15,7 @@ layout = html.Div(children=
 	[
 		dbc.Row(
 			[ 
-				dbc.Col(html.H2("Movies explorer")),
+				dbc.Col(html.H1("Movies explorer", style={"textAlign":"center"})),
 			]
 		),
 		dbc.Row(
